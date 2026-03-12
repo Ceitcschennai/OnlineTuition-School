@@ -100,7 +100,7 @@ const TeacherSubjects = () => {
   // Fetch teacher's assigned subjects
   useEffect(() => {
     const fetchTeacherSubjects = async () => {
-      if (!teacher || !teacher.id) {
+      if (!teacher || !teacher._id) {
         console.log('No teacher data or teacher ID found');
         setError('Please login again to continue.');
         setErrorCode('NO_TEACHER_DATA');
@@ -111,7 +111,7 @@ const TeacherSubjects = () => {
       try {
         console.log('Fetching subjects for teacher ID:', teacher.id);
 
-        const response = await fetch(`${API_BASE_URL}/api/teacher/subjects/${teacher.id}`);
+        const response = await fetch(`${API_BASE_URL}/api/teacher/subjects/${teacher._id}`);
         const data = await response.json();
 
         console.log('API Response:', data);
@@ -142,7 +142,7 @@ const TeacherSubjects = () => {
   }, [teacher]);
 
   const getTeacherLiveClasses = () => {
-    return liveClasses.filter(liveClass => liveClass.teacherId === teacher?.id);
+    return liveClasses.filter(liveClass => liveClass.teacherId === teacher?._id);
   };
 
   const isSubjectLive = (subjectName, className) => {
@@ -160,7 +160,7 @@ const TeacherSubjects = () => {
 
     try {
       // Generate unique room name for Jitsi
-      const roomName = generateRoomName(subject.name, className, teacher.id);
+      const roomName = generateRoomName(subject.name, className, teacher._id);
 
       const classData = {
         subject: subject.name,
