@@ -116,9 +116,7 @@ const TeacherDashboard = () => {
           <button onClick={() => navigate("/take-attendance")}>
             <FaCalendarCheck /> Mark Attendance
           </button>
-          <button onClick={() => navigate("/reports")}>
-            <FaChartBar /> View Reports
-          </button>
+          
         </div>
       </div>
 
@@ -195,25 +193,7 @@ const TeacherDashboard = () => {
           </div>
         </div>
 
-        {/* 🔵 Recent Activity */}
-        <div className="recent-section">
-          <h2>
-            <FaClock /> Recent Activities
-          </h2>
-
-          {recentActivities.length > 0 ? (
-            recentActivities.map((activity, index) => (
-              <div key={index} className="activity-item">
-                <p>{activity.message}</p>
-                <span>
-                  {new Date(activity.time).toLocaleString()}
-                </span>
-              </div>
-            ))
-          ) : (
-            <p>No recent activities</p>
-          )}
-        </div>
+        
       </div>
     </div>
   );

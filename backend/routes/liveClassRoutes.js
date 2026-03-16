@@ -9,6 +9,63 @@ router.use(express.json());
 router.use(express.raw({ type: 'application/json' }));
 
 // Get all live classes
+
+// Add this route — saves a scheduled (not yet live) class to MongoDB
+router.post('/schedule', async (req, res) => {
+  try {
+    const { className, subject, studentClass, date, time, platform, description, teacherId, teacherName, jitsiUrl, roomName } = req.body;
+
+    if (!className || !subject || !date || !time || !teacherId) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    const LiveClass = require('../models/LiveClass');
+    const { v4: uuidv4 } = require('uuid');
+
+    const scheduled = new LiveClass({
+      meetingId: uuidv4(),
+      subject,
+      teacher: teacherName,
+      teacherId,
+      class: studentClass || className,
+      isLive: false,           // ← NOT live yet
+      scheduledDate: date,
+      scheduledTime: time,
+      platform,
+      className,
+      description,
+      jitsiUrl: jitsiUrl || null,
+      roomName: roomName || null,
+    });
+
+    await scheduled.save();
+
+    // Notify all students via socket
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('classScheduled', { success: true, scheduledClass: scheduled });
+    }
+
+    res.json({ success: true, scheduledClass: scheduled });
+  } catch (error) {
+    console.error('Error scheduling class:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
+
+// Get all scheduled (not live) classes — for students to see upcoming
+router.get('/scheduled', async (req, res) => {
+  try {
+    const LiveClass = require('../models/LiveClass');
+    const filter = { isLive: false };
+    if (req.query.teacherId) filter.teacherId = req.query.teacherId;
+    const scheduled = await LiveClass.find(filter).sort({ scheduledDate: 1 });
+    res.json({ success: true, scheduledClasses: scheduled });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
+
 router.get('/', (req, res) => {
   try {
     const liveClasses = getLiveClasses();
@@ -250,5 +307,35 @@ router.get('/teacher/:teacherId', (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
+// Update meeting link (for Zoom, Google Meet etc.)
+router.patch('/scheduled/:id/link', async (req, res) => {
+  try {
+    const LiveClass = require('../models/LiveClass');
+    const updated = await LiveClass.findByIdAndUpdate(
+      req.params.id,
+      { manualLink: req.body.manualLink },
+      { new: true }
+    );
+    res.json({ success: true, scheduledClass: updated });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+// Delete a scheduled class
+router.delete('/scheduled/:id', async (req, res) => {
+  try {
+    const LiveClass = require('../models/LiveClass');
+    await LiveClass.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+  
+});
+
+
+
 
 module.exports = router;

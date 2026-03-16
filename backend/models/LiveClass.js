@@ -1,6 +1,16 @@
 const mongoose = require('mongoose');
 
 const liveClassSchema = new mongoose.Schema({
+
+  scheduledDate: String,
+scheduledTime: String,
+platform: { type: String, default: 'Jitsi Meet' },
+className: String,
+description: String,
+roomName: String,
+jitsiUrl: String,
+manualLink: String,
+
   meetingId: {
     type: String,
     required: true,
@@ -25,7 +35,7 @@ const liveClassSchema = new mongoose.Schema({
   },
   isLive: {
     type: Boolean,
-    default: true
+    default: false
   },
   startTime: {
     type: Date,
@@ -34,14 +44,14 @@ const liveClassSchema = new mongoose.Schema({
   endTime: {
     type: Date
   },
-  participants: [{
+ participants: [{
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       refPath: 'participants.userModel'
     },
     userModel: {
       type: String,
-      required: true,
+      required: false,
       enum: ['Student', 'Teacher']
     },
     name: String,
