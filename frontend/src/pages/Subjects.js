@@ -139,9 +139,7 @@ if (!allowedSubjectKeys) {
                 ) : (
                   <button
                     onClick={() =>
-                      navigate('/subject-details', {
-                        state: { subjectName: subject.name }
-                      })
+                     navigate(`/subjects/${subject.name}`)
                     }
                   >
                     View Details

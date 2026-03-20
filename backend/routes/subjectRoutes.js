@@ -31,6 +31,26 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+// ✅ Get subject by name (🔥 ADDED - DO NOT MOVE THIS)
+router.get("/:name", async (req, res) => {
+  try {
+    const subject = await Subject.findOne({
+name: { $regex: req.params.name, $options: "i" }
+    });
+
+    if (!subject) {
+      return res.status(404).json({ message: "Subject not found" });
+    }
+
+    res.json({ success: true, subject });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching subject" });
+  }
+});
+
+
 // ✅ Create subject
 router.post("/", async (req, res) => {
   try {

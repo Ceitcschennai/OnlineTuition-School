@@ -100,7 +100,7 @@ const AppContent = () => {
 
           {/* SUBJECT ROUTES */}
           <Route path="/subjects" element={<Subjects />} />
-          <Route path="/subject-details" element={<SubjectDetails />} />  
+  <Route path="/subjects/:subjectName" element={<SubjectDetails />} />
 
           {/* TEACHER */}
           <Route path="/teacher-subjects" element={<TeacherSubjects />} />

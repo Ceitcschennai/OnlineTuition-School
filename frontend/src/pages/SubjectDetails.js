@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "../styles/SubjectDetails.css";
 
 const subjectData = {
@@ -68,11 +68,33 @@ const subjectData = {
 };
 
 const SubjectDetails = () => {
-  const location = useLocation();
+  const { subjectName } = useParams();
   const navigate = useNavigate();
 
-  const subjectName = location.state?.subjectName;
-  const subject = subjectData[subjectName];
+  
+const formatSubjectName = (name) => {
+  if (!name) return "";
+
+  const map = {
+    computerscience: "Computer Science",
+    maths: "Maths",
+    social: "Social",
+    science: "Science",
+    tamil: "Tamil",
+    english: "English",
+    physics: "Physics",
+    chemistry: "Chemistry",
+    botany: "Botany",
+    zoology: "Zoology",
+    economics: "Economics",
+    accounts: "Accounts"
+  };
+
+  return map[name.toLowerCase()] || name;
+};
+
+const formattedName = formatSubjectName(subjectName);
+const subject = subjectData[formattedName];
 
   if (!subject) {
     return <h2 style={{ textAlign: "center" }}>Subject not found</h2>;
@@ -82,7 +104,7 @@ const SubjectDetails = () => {
     <div className="subject-details-wrapper">
       <button className="back-btn" onClick={() => navigate(-1)}>⬅ Back</button>
 
-      <h1>{subjectName}</h1>
+      <h1>{formattedName}</h1>
 
       <div className="subject-info-card">
         <p><strong>Staff:</strong> {subject.staff}</p>
